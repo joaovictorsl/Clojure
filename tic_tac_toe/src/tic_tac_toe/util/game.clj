@@ -13,11 +13,14 @@
 
 (defn mark-grid
   [grid row col marker]
-  (assoc grid row (mark-line (grid row) col marker)))
+  (assoc grid row
+    (mark-line (grid row) col marker)))
 
 (defn make-move
   [player grid]
-  (let [width (count (grid 0))
-        height (count grid)
-        row-col (getter/get-valid-position width height)]
-    (mark-grid grid (row-col 0) (row-col 1) player)))
+  (let [row-col (getter/get-valid-position grid)]
+    (mark-grid
+      grid
+      (row-col 0)                                           ;Row
+      (row-col 1)                                           ;Col
+      player)))

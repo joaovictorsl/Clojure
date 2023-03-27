@@ -18,5 +18,3 @@
     (if (= idx (dec (count line)))
       (str result (line idx))
       (recur (str result (line idx) " | ") (inc idx)))))
-
-(format-grid [[1 2 3] [1 2 3] [1 2 3]])

@@ -1,34 +1,51 @@
 (ns tic-tac-toe.util.getter
   (:require [clojure.string :as str]))
 
-(declare get-input is-valid? inside-bounds?)
+(declare get-row-col-input is-valid? inside-bounds?)
 
 (defn get-valid-position
-  [width height]
+  [grid]
   (loop
-    [input (get-input)]
-    (if (is-valid? input width height)
-      (map #(Integer/parseInt %) (str/split input #" "))
+    [input (get-row-col-input)]
+    (if (is-valid? input grid)
+      (vec (map #(- (Integer/parseInt %) 1) (str/split input #" ")))
       (do
-        (println "Invalid input. Try again.")
-        (recur (get-input))))))
+        (println "Invalid input, your input should look like \"row col\" in which row and coll are integers inside the bounds of the grid and not yet marked. Try again.")
+        (recur (get-row-col-input))))))
 
-(defn- get-input
+(defn- get-row-col-input
   []
   (println  "Select where you'll mark. Use \"row col\" to select where to mark.")
   (read-line))
 
+(defn- get-keep-game-going?
+  []
+  (println "Do you wish to continue? (1 means yes, everything else means no)")
+  (let [answer (read-line)]
+    (= answer "1")))
+
 (defn- is-valid?
-  [input width height]
+  [input grid]
   (and
     (re-matches #"^\d+\s\d+$" input)
-    (inside-bounds? input width height)))
+    (inside-bounds? input grid)))
+
+(defn- target-is-not-marked
+  [grid row col]
+  (let [line (grid (- row 1))
+        idx (- col 1)]
+    (= " " (line idx))))
 
 (defn- inside-bounds?
-  [input width height]
-  (let [row (get (str/split input #" ") 0)
+  [input grid]
+  (let [width (count (grid 0))
+        height (count grid)
+        row (get (str/split input #" ") 0)
         col (get (str/split input #" ") 1)
         row (Integer/parseInt row)
         col (Integer/parseInt col)]
-    (and (and (<= row height) (> row 0))
-         (and (<= col width) (> col 0)))))
+    (and (<= row height)
+         (> row 0)
+         (<= col width)
+         (> col 0)
+         (target-is-not-marked grid row col))))
